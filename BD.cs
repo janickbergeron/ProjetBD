@@ -33,8 +33,7 @@ namespace Projet_BD
 
        public static Animal AjouterAnimal()
         {
-            string couleur;
-            string proprietaire;
+            int id = Animal.AnimalList.Count + 1;
             Console.WriteLine("Entrez le type d'animal:");
             string type = Console.ReadLine();
             Console.WriteLine("Entrez le nom de l'animal:");
@@ -43,7 +42,14 @@ namespace Projet_BD
             int age = int.Parse(Console.ReadLine());
             Console.WriteLine("Entrez le poids de l'animal:");
             int poids = int.Parse(Console.ReadLine());
+            Console.WriteLine("Entrez la couleur de l'animal:");
+            string couleur = Console.ReadLine();
+            Console.WriteLine("Entrez le propriétaire de l'animal:");
+            string proprietaire = Console.ReadLine();
 
+
+            Animal animal = new(id, type, name, age, poids, couleur, proprietaire);
+            return animal;
         }
     }
 }

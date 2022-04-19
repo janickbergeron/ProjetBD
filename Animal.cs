@@ -37,5 +37,52 @@ namespace Projet_BD
             _proprietaire = proprietaire;
         }
         
+        public static List<Animal> GetAnimalList()
+        {
+            string query = "SELECT * FROM animal";
+
+            //Create a list to store the result
+            var list = new List<Animal>();
+
+            //Open connection
+            if (this.OpenConnection() == true)
+            {
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(query, connection);  //  connection???
+                //Create a data reader and Execute the command
+                MySqlDataReader dataReader = cmd.ExecuteReader();
+
+                //Read the data and store them in the list
+                while (dataReader.Read())
+                {
+                    list.Add(new Animal
+                    {
+                           Id = int.Parse(dataReader["ID"]),
+                           Type = dataReader["Type"].ToString(),
+                           Name = dataReader["Name"].ToString(),
+                           Age = int.Parse(dataReader["Age"]),
+                           Poids = int.Parse(dataReader["Poids"]),
+                           Couleur = dataReader["Couleur"].ToString(),
+                           Proprietaire = dataReader["Proprietaire"].ToString()
+                    });                        
+                }
+       
+                //Console.ReadLine();
+
+                //close Data Reader
+                dataReader.Close();
+
+                //close Connection
+                this.CloseConnection();
+
+                //return list to be displayed
+               return list;
+            }
+            else
+            {
+                return list;
+            }
+            
+        }
     }
 }
