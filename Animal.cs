@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace Projet_BD
 {
@@ -25,6 +26,7 @@ namespace Projet_BD
         public string Proprietaire { get { return _proprietaire; } set { _proprietaire = value; } }
 
         public static List<Animal> AnimalList = new List<Animal>();
+        public static List<string> ProprioList = new List<string>();
 
         public Animal(int id, string type, string name, int age, int poids, string couleur, string proprietaire)
         {
@@ -37,52 +39,6 @@ namespace Projet_BD
             _proprietaire = proprietaire;
         }
         
-        public static List<Animal> GetAnimalList()
-        {
-            string query = "SELECT * FROM animal";
-
-            //Create a list to store the result
-            var list = new List<Animal>();
-
-            //Open connection
-            if (this.OpenConnection() == true)
-            {
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, connection);  //  connection???
-                //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-
-                //Read the data and store them in the list
-                while (dataReader.Read())
-                {
-                    list.Add(new Animal
-                    {
-                           Id = int.Parse(dataReader["ID"]),
-                           Type = dataReader["Type"].ToString(),
-                           Name = dataReader["Name"].ToString(),
-                           Age = int.Parse(dataReader["Age"]),
-                           Poids = int.Parse(dataReader["Poids"]),
-                           Couleur = dataReader["Couleur"].ToString(),
-                           Proprietaire = dataReader["Proprietaire"].ToString()
-                    });                        
-                }
-       
-                //Console.ReadLine();
-
-                //close Data Reader
-                dataReader.Close();
-
-                //close Connection
-                this.CloseConnection();
-
-                //return list to be displayed
-               return list;
-            }
-            else
-            {
-                return list;
-            }
-            
-        }
+        
     }
 }
