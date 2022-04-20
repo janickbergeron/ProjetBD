@@ -4,17 +4,7 @@
     {
         static void Main(string[] args)
         {
-            //BD.ConnectToDatabase();
-            Animal.AnimalList = BD.GetAnimalList();
-            
-
-            Animal chien = new(0,"chien","fido",5,10,"bleu","pierre");
-            Animal chat = new(1,"chat", "mitaine", 2, 5, "brun", "gilles");
-            Animal.AnimalList.Add(chien);
-            Animal.AnimalList.Add(chat);
-
-            //Menu.ShowAllProprio();
-            //Menu.ShowAllAnimal();
+            Animal.AnimalList = BD.GetAnimalList(); //Initial data pull drom the database.
             Menu.ShowMainMenu();
         }
     }

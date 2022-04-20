@@ -38,7 +38,5 @@ namespace Projet_BD
             _couleur = couleur;
             _proprietaire = proprietaire;
         }
-        
-        
     }
 }

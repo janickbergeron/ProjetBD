@@ -9,35 +9,13 @@ namespace Projet_BD
 {
     internal class BD
     {
-       public static void ConnectToDatabase()
-        {
-            string connectionString = null;
-            MySqlConnection cnn;
-            connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-            cnn = new MySqlConnection(connectionString);
-
-                try
-                {
-                    cnn.Open();
-                    if (cnn.State== System.Data.ConnectionState.Open)
-                    {
-                        Console.WriteLine("Le connection a la BD est fonctionnel.");
-                    }
-                    cnn.Close();
-                }
-            catch (Exception ex)
-                {
-                    Console.WriteLine("Impossible d'ouvrir la connection" + ex.Message);
-                }
-        }
-
-       public static Animal AjouterAnimal()
+       public static Animal AjouterAnimal() //Function that returns an Animal object.
         {
             int age = 0;
             int poids = 0;
             string couleur;
-
             int id = Animal.AnimalList.Count + 1;
+
             Console.WriteLine("Entrez le type d'animal:");
             string type = Console.ReadLine();
             Console.WriteLine("Entrez le nom de l'animal:");
@@ -45,64 +23,57 @@ namespace Projet_BD
             Console.WriteLine("Entrez l'age de l'animal:");
             try{
                 do age = int.Parse(Console.ReadLine());
-                while (age <= 0);
+                while (age <= 0); //Ensure a positive number.
                 Console.WriteLine("Entrez le poids de l'animal:");
                 do poids = int.Parse(Console.ReadLine());
                 while (poids <= 0);
             }catch (Exception ex)
             {
-                Console.WriteLine("Entré invalide.");
+                Console.WriteLine("Entré invalide."); //This loop catches exceptions when user try to enter letters.
             }
             Console.WriteLine("Entrez la couleur de l'animal:(Rouge, Bleu ou Violet.)");
             do couleur = Console.ReadLine().ToLower();
-            while (couleur != "rouge" && couleur != "bleu" && couleur != "violet");
+            while (couleur != "rouge" && couleur != "bleu" && couleur != "violet");  //Ensure the user has entered one of the 3 colors.
             Console.WriteLine("Entrez le propriétaire de l'animal:");
             string proprietaire = Console.ReadLine();
-
 
             Animal animal = new(id, type, name, age, poids, couleur, proprietaire);
             return animal;
         }
-       public static void AddAnimalToDB(Animal animal)
+       public static void AddAnimalToDB(Animal animal)  //Function which take an Animal as parameter to send it's data to the database.
         {
-            string type = animal.Type;
+            string type = animal.Type;  //Animal attributes.
             string name = animal.Name;
             int age = animal.Age;
             int poids = animal.Poids;
             string couleur = animal.Couleur;
             string proprietaire = animal.Proprietaire;
 
-            string query = $"INSERT INTO animal(TypeAnimal, Nom, Age, Poids, Couleur, Proprietaire) VALUES('{type}','{name}',{age},{poids},'{couleur}','{proprietaire}')";
-            string connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-            MySqlConnection cnn = new MySqlConnection(connectionString);
+            string query = $"INSERT INTO animal(TypeAnimal, Nom, Age, Poids, Couleur, Proprietaire) VALUES('{type}','{name}',{age},{poids},'{couleur}','{proprietaire}')"; //SQL query to write values into tables.
+            string connectionString = "server=localhost;database=clinique;uid=root;pwd=;"; //Database connection info.
 
-            cnn.Open();
-            //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, cnn);
+            MySqlConnection cnn = new MySqlConnection(connectionString); //SQLConnection object with connection info.
+            cnn.Open(); //Open connection to database.
+            MySqlCommand cmd = new MySqlCommand(query, cnn); //Create SQL Command.
+            MySqlDataReader dataReader = cmd.ExecuteReader(); //Create a data reader and Execute the command.
 
-            //Create a data reader and Execute the command
-            MySqlDataReader dataReader = cmd.ExecuteReader();
-            //close Data Reader
-            dataReader.Close();
-            cnn.Close();
+            dataReader.Close(); //close Data Reader.
+            cnn.Close(); //Close connection to database
+
+            Console.WriteLine("L'animal a été ajouté a la pension.");
         }
-       public static List<Animal> GetAnimalList()
+       public static List<Animal> GetAnimalList() //Function to pull all animal data from database to then store in a List<Animal>.
         {
-            string query = "SELECT * FROM animal";
-            string connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-            MySqlConnection cnn = new MySqlConnection(connectionString);
+            string query = "SELECT * FROM animal"; //SQL query to select all data from the table.
+            string connectionString = "server=localhost;database=clinique;uid=root;pwd=;"; //Database connection info.
+            var list = new List<Animal>(); //Create a list to store the result
 
-            //Create a list to store the result
-            var list = new List<Animal>();
-            cnn.Open();
-            //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, cnn);
+            MySqlConnection cnn = new MySqlConnection(connectionString); //SQLConnection object with connection info.
+            cnn.Open(); //Open connection to database.
+            MySqlCommand cmd = new MySqlCommand(query, cnn);  //Create Command
+            MySqlDataReader dataReader = cmd.ExecuteReader(); //Create a data reader and Execute the command
 
-            //Create a data reader and Execute the command
-            MySqlDataReader dataReader = cmd.ExecuteReader();
-
-            //Read the data and store them in the list
-            while (dataReader.Read())
+            while (dataReader.Read())   //Read the data and store them in the list
             {
                 list.Add(new Animal
                 (
@@ -113,103 +84,75 @@ namespace Projet_BD
                        (int)dataReader["Poids"],
                        (string)dataReader["Couleur"],
                        (string)dataReader["Proprietaire"]
-                ));
+                ));  //Animal Constructor.
             }
+            dataReader.Close(); //close Data Reader
+            cnn.Close(); //Close connection to database
 
-            //close Data Reader
-            dataReader.Close();
-            cnn.Close();
-
-            //return list to be displayed
-            return list;
-
-
+            return list; //return list to be displayed
         }
-       public static List<string> GetProprietaireList()
+       public static List<string> GetProprietaireList() //Function that returns a List of all owner's name.
        {
+                string query = "SELECT Proprietaire FROM animal"; //Query to select the "proprietaire" column from the table.
+                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;"; //Database connection info.
+                var list = new List<string>();  //Create a list to store the result.
 
-                string query = "SELECT Proprietaire FROM animal";
-                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-                MySqlConnection cnn = new MySqlConnection(connectionString);
+                MySqlConnection cnn = new MySqlConnection(connectionString); //SQLConnection object with connection info.
+                cnn.Open(); //Open connection to database
+                MySqlCommand cmd = new MySqlCommand(query, cnn); //Create Command
+                MySqlDataReader dataReader = cmd.ExecuteReader(); //Create a data reader and Execute the command
 
-                //Create a list to store the result
-                var list = new List<string>();
-                cnn.Open();
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, cnn);
-
-                //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-
-                //Read the data and store them in the list
-                while (dataReader.Read())
+                while (dataReader.Read()) //Read the data and store them in the list
                 {
                     list.Add((string)dataReader["Proprietaire"]);
                 }
+                dataReader.Close(); //close Data Reader
+                cnn.Close(); //Close connection to database.
 
-                //close Data Reader
-                dataReader.Close();
-                cnn.Close();
-
-                //return list to be displayed
-                return list;
-
-            
+                return list;  //return list to be displayed
        }
-       public static int GetAnimalWeight()
+       public static int GetAnimalWeight() //Function to get the sum on all animal weight.
        {            
-            List<Animal> AnimalList = BD.GetAnimalList();
-            if (AnimalList.Count < 0)
+            List<Animal> AnimalListCount = BD.GetAnimalList(); //Pulls data from Database to know if any animals are present.
+            if (AnimalListCount.Count < 0)
             {
-                    int sum = 0;
-                string query = "SELECT Poids FROM animal";
-                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-                MySqlConnection cnn = new MySqlConnection(connectionString);
+                int sum = 0; 
+                string query = "SELECT Poids FROM animal"; //Query to select the "poids" column from the table.
+                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;"; //Database connection info.
+                var list = new List<int>(); //Create a list to store the result
 
-                //Create a list to store the result
-                var list = new List<int>();
-                cnn.Open();
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, cnn);
+                MySqlConnection cnn = new MySqlConnection(connectionString); //SQLConnection object with connection info.
+                cnn.Open(); //Open connection to database
+                MySqlCommand cmd = new MySqlCommand(query, cnn); //Create Command
+                MySqlDataReader dataReader = cmd.ExecuteReader();  //Create a data reader and Execute the command
 
-                //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-
-                //Read the data and store them in the list
-                while (dataReader.Read())
+                while (dataReader.Read())  //Read the data and store them in the list
                 {
                     list.Add((int)dataReader["Poids"]);
                 }
+                dataReader.Close();  //close Data Reader
+                cnn.Close(); //Close connection to database.
 
-                //close Data Reader
-                dataReader.Close();
-                cnn.Close();
-
-                sum = list.Sum();
-                //return list to be displayed
-                return sum;
+                sum = list.Sum(); //This adds up each int from the list.
+                
+                return sum; //return the sum of all the weight.
             }
             else
-                Console.WriteLine("Aucun pensionnaire a lister.");
+                Console.WriteLine("Aucun pensionnaire a lister.");  //Only happens if AnimalListCount.Count <= 0
             return 0;
        }
-       public static List<Animal> GetAnimalColor(string color)
+       public static List<Animal> GetAnimalColor(string color) //Function to get all animals of a given color.
         {
-            string query = $"SELECT * FROM animal WHERE Couleur = '{color}'";
-            string connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-            MySqlConnection cnn = new MySqlConnection(connectionString);
+            string query = $"SELECT * FROM animal WHERE Couleur = '{color}'"; //Query to select all animal of a given color from the table.
+            string connectionString = "server=localhost;database=clinique;uid=root;pwd=;"; //Database connection info.
+            var list = new List<Animal>(); //Create a list to store the result
 
-            //Create a list to store the result
-            var list = new List<Animal>();
-            cnn.Open();
-            //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, cnn);
+            MySqlConnection cnn = new MySqlConnection(connectionString); //SQLConnection object with connection info.
+            cnn.Open(); //Open connection to database
+            MySqlCommand cmd = new MySqlCommand(query, cnn); //Create Command
+            MySqlDataReader dataReader = cmd.ExecuteReader(); //Create a data reader and Execute the command
 
-            //Create a data reader and Execute the command
-            MySqlDataReader dataReader = cmd.ExecuteReader();
-
-            //Read the data and store them in the list
-            while (dataReader.Read())
+            while (dataReader.Read()) //Read the data and store them in the list
             {
                 list.Add(new Animal
                 (
@@ -220,69 +163,62 @@ namespace Projet_BD
                        (int)dataReader["Poids"],
                        (string)dataReader["Couleur"],
                        (string)dataReader["Proprietaire"]
-                ));
+                )); //Animal Constructor
             }
+            dataReader.Close(); //close Data Reader
+            cnn.Close(); //Close connection to database.
 
-            //close Data Reader
-            dataReader.Close();
-            cnn.Close();
-
-            //return list to be displayed
-            return list;
-
-
+            return list; //return list to be displayed.
         }
-        public static void RemoveAnimal(int id)
+       public static void RemoveAnimal(int id) //Function to remove an animal from the database.
         {
-            List<Animal> AnimalList = BD.GetAnimalList();
-            if (AnimalList.Count > 0)
+            List<Animal> AnimalListCount = BD.GetAnimalList(); //Pulls data from Database to know if any animals are present to remove.
+            if (AnimalListCount.Count > 0)
             {
-                string query = $"DELETE from animal WHERE ID = '{id}'";
-                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-                MySqlConnection cnn = new MySqlConnection(connectionString);
-                cnn.Open();
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, cnn);
+                string query = $"DELETE from animal WHERE ID = '{id}'"; //Query to remove an animal from the table.
+                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;"; //Database connection info.
 
-                //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-                dataReader.Close();
-                cnn.Close();
+                MySqlConnection cnn = new MySqlConnection(connectionString); //SQLConnection object with connection info.
+                cnn.Open(); //Open connection to database
+                MySqlCommand cmd = new MySqlCommand(query, cnn); //Create Command
+                MySqlDataReader dataReader = cmd.ExecuteReader(); //Create a data reader and Execute the command
+
+                dataReader.Close(); //close Data Reader
+                cnn.Close(); //Close connection to database.
+
                 Console.WriteLine($"Le pensionnaire numéro {id} à été retiré.");
                 Console.ReadKey();
                 Menu.ShowAllAnimal();
             }
             else
-                Console.WriteLine("Aucun pensionnaire a retirer.");
+                Console.WriteLine("Aucun pensionnaire a retirer.");  //Only happens if AnimalListCount.Count <= 0
                 Console.ReadKey();
         }
-        public static void UpdateAnimal(int id, string name)
+       public static void UpdateAnimal(int id, string name) //Function to update an animal in the database
         {
-            List<Animal> AnimalList = BD.GetAnimalList();
-            if (AnimalList.Count > 0)
+            List<Animal> AnimalListCount = BD.GetAnimalList(); //Pulls data from Database to know if any animals are present to update.
+            if (AnimalListCount.Count > 0)
             {
-                string query = $"UPDATE animal SET Name = '{name}' WHERE ID = '{id}'";
-                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;";
-                MySqlConnection cnn = new MySqlConnection(connectionString);
+                string query = $"UPDATE animal SET Name = '{name}' WHERE ID = '{id}'";  //Query to update then "name" column from the table.
+                string connectionString = "server=localhost;database=clinique;uid=root;pwd=;"; //Database connection info.
 
-                cnn.Open();
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, cnn);
+                MySqlConnection cnn = new MySqlConnection(connectionString); //SQLConnection object with connection info.
+                cnn.Open(); //Open connection to database
+                MySqlCommand cmd = new MySqlCommand(query, cnn); //Create Command
+                MySqlDataReader dataReader = cmd.ExecuteReader(); //Create a data reader and Execute the command
+               
+                dataReader.Close(); //close Data Reader
+                cnn.Close(); //Close connection to database.
 
-                //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-                dataReader.Close();
-                cnn.Close();
-                Console.WriteLine($"Le nom du pensionnaire {id} à été modifié.");
+                Console.WriteLine($"Le nom du pensionnaire {id} à été modifié.");  
                 Console.ReadKey();
                 Menu.ShowAllAnimal();
             }
             else
             {
-                Console.WriteLine("Aucun pensionnaire a modifier.");
+                Console.WriteLine("Aucun pensionnaire a modifier.");   //Only happens if AnimalListCount.Count <= 0
                 Console.ReadKey();
             }
         }
-
     }
 }
